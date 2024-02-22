@@ -1,5 +1,9 @@
 package com.epam.mjc;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 public class MethodParser {
 
     /**
@@ -20,6 +24,40 @@ public class MethodParser {
      * @return {@link MethodSignature} object filled with parsed values from source string
      */
     public MethodSignature parseFunction(String signatureString) {
-        throw new UnsupportedOperationException("You should implement this method.");
+        String[] elems = signatureString.split(" ");
+        String returnType;
+        String accessModifier = null;
+        int pos = -1;
+        for(int i = 0; i < elems.length; i++) {
+            if(elems[i].contains("(")) {
+                pos = i;
+                break;
+            }
+        }
+
+        if(pos < 2) {
+            returnType = elems[0];
+        }else {
+            returnType = elems[1];
+            accessModifier = elems[0];
+        }
+        String methodGeneral = elems[pos] + " ";
+        for(int i = pos + 1; i < elems.length; i++) {
+            methodGeneral += elems[i] + " ";
+        }
+        String[] parts = methodGeneral.split(("[\\(]|[\\)]"));
+        String methodName = parts[0];
+        String[] arguments = parts[1].split(", ");
+        List<MethodSignature.Argument> argumentList = new ArrayList<>();
+        for(String str : arguments) {
+            if(str.length() < 1) continue;
+            MethodSignature.Argument argument = new MethodSignature.Argument(str.split(" ")[0],
+                    str.split(" ")[1]);
+            argumentList.add(argument);
+        }
+        MethodSignature result = new MethodSignature(methodName, argumentList);
+        result.setAccessModifier(accessModifier);
+        result.setReturnType(returnType);
+        return result;
     }
 }
